@@ -21,7 +21,7 @@
                 @foreach($requests as $index => $request)
                     <tr class="{{ $index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }}">
                         <td class="py-3 px-4">{{ $index + 1 }}</td>
-                        <td class="py-3 px-4">{{ $request->peminjaman->user->name ?? 'N/A' }}</td>
+                        <td class="py-3 px-4">{{ $request->peminjaman->user->username ?? 'N/A' }}</td>
                         <td class="py-3 px-4">{{ $request->peminjaman->barang->nama_barang ?? 'N/A' }}</td>
                         <td class="py-3 px-4">{{ \Carbon\Carbon::parse($request->tanggal_kembali)->format('d/m/Y') }}</td>
                         <td class="py-3 px-4">

@@ -4,6 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @auth
+    @if (Auth::user()->role !== 'admin')
+        <script>
+            window.location.href = "{{ route('login') }}";
+        </script>
+    @endif
+    @endauth
     <title>@yield('title', 'Sisfo Sarpras') - Sistem Informasi Sarana Prasarana</title>
 
     <!-- Favicon -->
