@@ -38,21 +38,21 @@ class DummyDataSeeder extends Seeder
         $admin = User::create([
             'username' => 'Admin',
             'email' => 'admin@gmail.com',
-            'password' => Hash::make('Admin1313'),
+            'password' => Hash::make('admin123'),
             'role' => 'admin',
         ]);
 
         $user = User::create([
-            'username' => 'kijok',
-            'email' => 'kijok@gmail.com',
-            'password' => Hash::make('kijok1313'),
+            'username' => 'ahza',
+            'email' => 'ahza@gmail.com',
+            'password' => Hash::make('ahza123'),
             'role' => 'user',
         ]);
 
         // Buat barang dengan field lengkap
         $barang1 = Barang::create([
             'kode_barang' => 'BRG001',
-            'nama_barang' => 'Laptop ASUS ROG',
+            'nama_barang' => 'Laptop Dell Inspiron',
             'id_kategori' => $kategoriElektronik->id_kategori,
             'jumlah' => 10,
             'tersedia' => 8,
@@ -66,7 +66,7 @@ class DummyDataSeeder extends Seeder
 
         $barang2 = Barang::create([
             'kode_barang' => 'BRG002',
-            'nama_barang' => 'Printer Canon MX497',
+            'nama_barang' => 'Printer Epson L3150',
             'id_kategori' => $kategoriElektronik->id_kategori,
             'jumlah' => 5,
             'tersedia' => 0,
@@ -80,7 +80,7 @@ class DummyDataSeeder extends Seeder
 
         $barang3 = Barang::create([
             'kode_barang' => 'BRG003',
-            'nama_barang' => 'Meja Kerja Kayu',
+            'nama_barang' => 'Kursi Kantor Ergonomis',
             'id_kategori' => $kategoriFurniture->id_kategori,
             'jumlah' => 8,
             'tersedia' => 7,
@@ -88,13 +88,13 @@ class DummyDataSeeder extends Seeder
             'kondisi' => 'Baik',
             'lokasi' => 'Lab Multimedia',
             'status' => 'tersedia',
-            'keterangan' => 'Meja kerja dengan laci penyimpanan',
+            'keterangan' => 'Kursi kerja dengan penyangga punggung yang nyaman',
 
        ]);
 
         $barang4 = Barang::create([
             'kode_barang' => 'BRG004',
-            'nama_barang' => 'Pulpen Pilot',
+            'nama_barang' => 'Pulpen Hitam',
             'id_kategori' => $kategoriAlatTulis->id_kategori,
             'jumlah' => 50,
             'tersedia' => 50,

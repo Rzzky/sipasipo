@@ -15,87 +15,58 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Count summary data
+        // Data ringkasan utama
         $totalBarang = Barang::count();
         $totalKategori = Kategori::count();
         $barangTersedia = Barang::sum('tersedia');
         $barangDipinjam = Barang::sum('dipinjam');
-
-        // Get active loan count
         $peminjamanAktif = Peminjaman::where('status', 'dipinjam')->count();
+        $pengembalian = Pengembalian::where('label_status', 'selesai')->count();
 
-        // Get returned items count
-        $pengembalian = Pengembalian::count();
-
-        // Get top 5 most borrowed items
-        $topBarang = Peminjaman::select('id_barang', DB::raw('COUNT(*) as total_peminjaman'))
-            ->with('barang')
-            ->groupBy('id_barang')
-            ->orderBy('total_peminjaman', 'desc')
-            ->limit(5)
-            ->get();
-
-        // Get recent loans (latest 5)
+        // Data untuk Timeline Aktivitas Terbaru
         $recentPeminjaman = Peminjaman::with(['user', 'barang'])
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
-        // Get loans expiring soon (next 7 days)
-        $today = Carbon::now()->format('Y-m-d');
-        $weekLater = Carbon::now()->addDays(7)->format('Y-m-d');
-
+        // Data untuk Peminjaman Jatuh Tempo
         $expiringLoans = Peminjaman::with(['user', 'barang'])
             ->where('status', 'dipinjam')
-            ->whereBetween('tanggal_kembali', [$today, $weekLater])
+            ->where('tanggal_kembali', '>=', Carbon::now())
+            ->where('tanggal_kembali', '<=', Carbon::now()->addDays(7))
             ->orderBy('tanggal_kembali', 'asc')
             ->limit(5)
             ->get();
 
-        // Items per category chart data
+        // Data untuk Chart Komposisi Kategori
         $kategoriBarchart = Kategori::withCount('barang')
             ->orderBy('barang_count', 'desc')
             ->get();
 
-        // Monthly activity chart data (last 6 months)
+        // Data untuk Chart Aktivitas Bulanan
         $monthlyData = [];
         for ($i = 5; $i >= 0; $i--) {
             $month = Carbon::now()->subMonths($i);
-            $monthName = $month->format('M');
-            $year = $month->format('Y');
-            $startDate = Carbon::create($year, $month->format('m'), 1)->format('Y-m-d');
-            $endDate = Carbon::create($year, $month->format('m'), $month->daysInMonth)->format('Y-m-d');
-
-            $peminjaman = Peminjaman::whereBetween('tanggal_pinjam', [$startDate, $endDate])->count();
-            $pengembalian = Pengembalian::whereBetween('tanggal_kembali', [$startDate, $endDate])->count();
-
+            $peminjamanCount = Peminjaman::whereYear('tanggal_pinjam', $month->year)
+                ->whereMonth('tanggal_pinjam', $month->month)
+                ->count();
+            $pengembalianCount = Pengembalian::whereYear('tanggal_kembali', $month->year)
+                ->whereMonth('tanggal_kembali', $month->month)
+                ->where('label_status', 'selesai')
+                ->count();
             $monthlyData[] = [
-                'month' => $monthName,
-                'peminjaman' => $peminjaman,
-                'pengembalian' => $pengembalian
+                'month' => $month->format('M'),
+                'peminjaman' => $peminjamanCount,
+                'pengembalian' => $pengembalianCount
             ];
         }
 
-        // Low stock items (less than 5 available)
-        $lowStockItems = Barang::where('tersedia', '<', 5)
-            ->where('status', 'aktif')
-            ->with('kategori')
-            ->limit(5)
-            ->get();
-
-        // Check if user is admin
+        // Data untuk Panel "Perlu Perhatian Anda"
+        $requestPeminjaman = Peminjaman::where('status', 'menunggu')->get();
+        // Query diperbaiki dari 'status' menjadi 'label_status'
+        $requestPengembalian = Pengembalian::where('label_status', 'menunggu')->get();
+        
         $isAdmin = auth()->user()->role === 'admin';
-
-        // If admin, get additional data
-        $userCount = 0;
-        $latestUsers = [];
-
-        if ($isAdmin) {
-            $userCount = User::count();
-            $latestUsers = User::orderBy('created_at', 'desc')
-                ->limit(5)
-                ->get();
-        }
 
         return view('dashboard', compact(
             'totalBarang',
@@ -104,15 +75,13 @@ class DashboardController extends Controller
             'barangDipinjam',
             'peminjamanAktif',
             'pengembalian',
-            'topBarang',
             'recentPeminjaman',
             'expiringLoans',
             'kategoriBarchart',
             'monthlyData',
-            'lowStockItems',
-            'isAdmin',
-            'userCount',
-            'latestUsers'
+            'requestPeminjaman',
+            'requestPengembalian',
+            'isAdmin'
         ));
     }
 }

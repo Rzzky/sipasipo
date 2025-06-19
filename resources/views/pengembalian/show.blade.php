@@ -3,189 +3,81 @@
 @section('title', 'Detail Pengembalian')
 
 @section('content')
-    <div class="bg-white rounded-lg shadow-lg p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold text-gray-800">
-                <i class="fas fa-undo-alt mr-2"></i>Detail Pengembalian
-            </h2>
-            <div class="flex space-x-3">
-                <a href="{{ route('pengembalian.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition duration-300">
-                    <i class="fas fa-arrow-left mr-1"></i> Kembali
-                </a>
-                <form action="{{ route('pengembalian.destroy', $pengembalian->id_pengembalian) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data pengembalian ini? Status peminjaman akan dikembalikan ke dipinjam dan stok barang akan disesuaikan.');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition duration-300">
-                        <i class="fas fa-trash-alt mr-1"></i> Hapus
-                    </button>
-                </form>
-            </div>
-        </div>
+<div class="max-w-4xl mx-auto">
+     <div class="mb-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-800">Detail Pengembalian</h2>
+        <a href="{{ route('pengembalian.index') }}" class="text-sm font-medium text-gray-600 hover:text-indigo-600">
+            <i class="fas fa-arrow-left mr-2"></i>Kembali ke Daftar Pengembalian
+        </a>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Informasi Pengembalian -->
-            <div class="bg-indigo-50 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold text-indigo-800 mb-4 flex items-center">
-                    <i class="fas fa-info-circle mr-2"></i>Informasi Pengembalian
-                </h3>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">ID Pengembalian:</span>
-                        <span class="font-medium text-gray-800">{{ $pengembalian->id_pengembalian }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Tanggal Kembali:</span>
-                        <span class="font-medium text-gray-800">{{ \Carbon\Carbon::parse($pengembalian->tanggal_kembali)->format('d M Y') }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Status:</span>
-                        <span>
-                            @if($pengembalian->label_status == 'selesai')
-                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Selesai</span>
-                            @elseif($pengembalian->label_status == 'menunggu')
-                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Menunggu</span>
-                            @elseif($pengembalian->label_status == 'penting')
-                                <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Penting</span>
-                            @else
-                                <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">-</span>
-                            @endif
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Informasi Peminjaman -->
-            <div class="bg-blue-50 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
-                    <i class="fas fa-hand-holding mr-2"></i>Informasi Peminjaman
-                </h3>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">ID Peminjaman:</span>
-                        <span class="font-medium text-gray-800">{{ $pengembalian->peminjaman->id_peminjaman }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Tanggal Pinjam:</span>
-                        <span class="font-medium text-gray-800">{{ \Carbon\Carbon::parse($pengembalian->peminjaman->tanggal_pinjam)->format('d M Y') }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Deadline:</span>
-                        <span class="font-medium text-gray-800">
-                            {{ $pengembalian->peminjaman->tanggal_deadline ? \Carbon\Carbon::parse($pengembalian->peminjaman->tanggal_deadline)->format('d M Y') : 'Tidak ada' }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data Peminjam -->
-            <div class="bg-green-50 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
-                    <i class="fas fa-user mr-2"></i>Data Peminjam
-                </h3>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Nama:</span>
-                        <span class="font-medium text-gray-800">
-                            {{ $pengembalian->peminjaman->user->nama ?? $pengembalian->peminjaman->user->username ?? 'User tidak tersedia' }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Email:</span>
-                        <span class="font-medium text-gray-800">
-                            {{ $pengembalian->peminjaman->user->email ?? 'Email tidak tersedia' }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Telepon:</span>
-                        <span class="font-medium text-gray-800">
-                            {{ $pengembalian->peminjaman->user->telepon ?? 'Telepon tidak tersedia' }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Informasi Barang -->
-            <div class="bg-yellow-50 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold text-yellow-800 mb-4 flex items-center">
-                    <i class="fas fa-box mr-2"></i>Informasi Barang
-                </h3>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Nama Barang:</span>
-                        <span class="font-medium text-gray-800">
-                            {{ $pengembalian->peminjaman->barang->nama_barang ?? 'Barang tidak tersedia' }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Kode:</span>
-                        <span class="font-medium text-gray-800">
-                            {{ $pengembalian->peminjaman->barang->kode ?? '-' }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Jumlah:</span>
-                        <span class="font-medium text-gray-800">
-                            {{ $pengembalian->peminjaman->jumlah ?? '0' }} unit
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Keterangan -->
-        <div class="mt-6 bg-gray-50 p-4 rounded-lg">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-clipboard-list mr-2"></i>Keterangan
-            </h3>
-            <div class="bg-white p-4 rounded-lg border border-gray-200">
-                {{ $pengembalian->keterangan ?? 'Tidak ada keterangan' }}
-            </div>
-        </div>
-
-        <!-- Riwayat -->
-        <div class="mt-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-history mr-2"></i>Timeline
-            </h3>
-            <div class="relative pl-8 border-l-2 border-indigo-600">
-                <!-- Peminjaman dibuat -->
-                <div class="mb-6 relative">
-                    <div class="absolute -left-[27px] bg-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-white">
-                        <i class="fas fa-hand-holding text-xs"></i>
-                    </div>
-                    <div class="bg-white p-3 rounded-lg shadow-sm">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-medium text-indigo-800">Peminjaman Dibuat</span>
-                            <span class="text-sm text-gray-500">
-                                {{ \Carbon\Carbon::parse($pengembalian->peminjaman->created_at)->format('d M Y H:i') }}
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                 <h3 class="text-lg font-semibold text-gray-800 border-b pb-3 mb-4">Detail Transaksi</h3>
+                 <dl class="space-y-4">
+                     <div>
+                         <dt class="text-sm font-medium text-gray-500">ID Pengembalian</dt>
+                         <dd class="mt-1 text-sm text-gray-900 font-semibold">#{{ $pengembalian->id_pengembalian }}</dd>
+                     </div>
+                     <div>
+                         <dt class="text-sm font-medium text-gray-500">Tanggal Kembali</dt>
+                         <dd class="mt-1 text-sm text-gray-900">{{ \Carbon\Carbon::parse($pengembalian->tanggal_kembali)->format('d F Y') }}</dd>
+                     </div>
+                     <div>
+                         <dt class="text-sm font-medium text-gray-500">Tanggal Pinjam</dt>
+                         <dd class="mt-1 text-sm text-gray-900">{{ \Carbon\Carbon::parse($pengembalian->peminjaman->tanggal_pinjam)->format('d F Y') }}</dd>
+                     </div>
+                      <div>
+                        <dt class="text-sm font-medium text-gray-500">Status</dt>
+                        <dd class="mt-1">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {{ $pengembalian->label_status == 'selesai' ? 'bg-green-100 text-green-800' : '' }}
+                                {{ $pengembalian->label_status == 'menunggu' ? 'bg-blue-100 text-blue-800' : '' }}
+                                {{ $pengembalian->label_status == 'penting' ? 'bg-orange-100 text-orange-800' : '' }}
+                                {{ $pengembalian->label_status == 'ditolak' ? 'bg-red-100 text-red-800' : '' }}">
+                                {{ ucfirst($pengembalian->label_status) }}
                             </span>
-                        </div>
-                        <p class="text-sm text-gray-600">
-                            Peminjaman baru dibuat dengan status
-                            <span class="inline-block px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs">dipinjam</span>
-                        </p>
+                        </dd>
                     </div>
-                </div>
-
-                <!-- Barang dikembalikan -->
-                <div class="relative">
-                    <div class="absolute -left-[27px] bg-green-600 rounded-full w-6 h-6 flex items-center justify-center text-white">
-                        <i class="fas fa-undo-alt text-xs"></i>
-                    </div>
-                    <div class="bg-white p-3 rounded-lg shadow-sm">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-medium text-green-800">Barang Dikembalikan</span>
-                            <span class="text-sm text-gray-500">
-                                {{ \Carbon\Carbon::parse($pengembalian->created_at)->format('d M Y H:i') }}
-                            </span>
-                        </div>
-                        <p class="text-sm text-gray-600">
-                            Barang telah dikembalikan dengan status
-                            <span class="inline-block px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs">kembali</span>
-                        </p>
-                    </div>
-                </div>
+                 </dl>
             </div>
+            
+            <div>
+                 <h3 class="text-lg font-semibold text-gray-800 border-b pb-3 mb-4">Info Barang & Peminjam</h3>
+                 <dl class="space-y-4">
+                     <div>
+                         <dt class="text-sm font-medium text-gray-500">Nama Barang</dt>
+                         <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $pengembalian->peminjaman->barang->nama_barang ?? 'N/A' }}</dd>
+                     </div>
+                     <div>
+                         <dt class="text-sm font-medium text-gray-500">Jumlah</dt>
+                         <dd class="mt-1 text-sm text-gray-900">{{ $pengembalian->peminjaman->jumlah ?? '0' }} unit</dd>
+                     </div>
+                     <div>
+                         <dt class="text-sm font-medium text-gray-500">Peminjam</dt>
+                         <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $pengembalian->peminjaman->user->username ?? 'N/A' }}</dd>
+                     </div>
+                 </dl>
+            </div>
+            
+            <div class="md:col-span-2">
+                 <h3 class="text-lg font-semibold text-gray-800 border-b pb-3 mb-4">Keterangan</h3>
+                 <div class="mt-1 text-sm text-gray-900 bg-gray-50 p-4 rounded-md">
+                     {{ $pengembalian->keterangan ?: 'Tidak ada keterangan.' }}
+                 </div>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+            <form action="{{ route('pengembalian.destroy', $pengembalian->id_pengembalian) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus data pengembalian ini?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition">
+                    <i class="fas fa-trash mr-2"></i>Hapus
+                </button>
+            </form>
         </div>
     </div>
+</div>
 @endsection
